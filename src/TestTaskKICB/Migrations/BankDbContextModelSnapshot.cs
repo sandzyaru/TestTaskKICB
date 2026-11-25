@@ -1,0 +1,306 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using TestTaskKICB.Infrastructure.DB;
+
+#nullable disable
+
+namespace TestTaskKICB.Migrations
+{
+    [DbContext(typeof(BankDbContext))]
+    partial class BankDbContextModelSnapshot : ModelSnapshot
+    {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.28")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.AccountRow", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Balance")
+                        .HasPrecision(19, 2)
+                        .HasColumnType("numeric(19,2)")
+                        .HasColumnName("balance");
+
+                    b.Property<DateTimeOffset?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("closed_at");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
+                        .HasColumnName("currency");
+
+                    b.Property<long>("CustomerId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("customer_id");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)")
+                        .HasColumnName("number");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("Number")
+                        .IsUnique()
+                        .HasDatabaseName("ux_accounts_number");
+
+                    b.ToTable("accounts", "accounts", t =>
+                        {
+                            t.HasCheckConstraint("ck_accounts_balance", "balance >= 0 AND balance <> 'NaN'::numeric");
+
+                            t.HasCheckConstraint("ck_accounts_closed_balance", "closed_at IS NULL OR balance = 0");
+
+                            t.HasCheckConstraint("ck_accounts_currency", "currency IN ('KGS', 'USD', 'EUR')");
+                        });
+                });
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.CardRow", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AccountId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateOnly>("ExpirationDate")
+                        .HasColumnType("date")
+                        .HasColumnName("expiration_date");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_blocked");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(19)
+                        .HasColumnType("character varying(19)")
+                        .HasColumnName("number");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("Number")
+                        .IsUnique()
+                        .HasDatabaseName("ux_cards_number");
+
+                    b.ToTable("cards", "accounts", t =>
+                        {
+                            t.HasCheckConstraint("ck_cards_type", "type IN ('Debit', 'Credit')");
+                        });
+                });
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.CustomerRow", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date")
+                        .HasColumnName("date_of_birth");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("first_name");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("last_name");
+
+                    b.Property<string>("NormalizedEmail")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
+                        .HasColumnName("normalized_email");
+
+                    b.Property<string>("Patronymic")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("patronymic");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .IsUnique()
+                        .HasDatabaseName("ux_customers_normalized_email");
+
+                    b.ToTable("customers", "customers");
+                });
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.PhoneRow", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CustomerId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("customer_id");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("number");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId", "Number")
+                        .IsUnique()
+                        .HasDatabaseName("ux_phones_customer_number");
+
+                    b.ToTable("phones", "customers", t =>
+                        {
+                            t.HasCheckConstraint("ck_phones_type", "type IN ('Mobile', 'Home', 'Work')");
+                        });
+                });
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.TransferRow", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(19, 2)
+                        .HasColumnType("numeric(19,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
+                        .HasColumnName("currency");
+
+                    b.Property<long>("DestinationAccountId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("destination_account_id");
+
+                    b.Property<long>("SourceAccountId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("source_account_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationAccountId");
+
+                    b.HasIndex("SourceAccountId");
+
+                    b.ToTable("transfers", "accounts", t =>
+                        {
+                            t.HasCheckConstraint("ck_transfers_amount", "amount > 0 AND amount <> 'NaN'::numeric");
+
+                            t.HasCheckConstraint("ck_transfers_currency", "currency IN ('KGS', 'USD', 'EUR')");
+
+                            t.HasCheckConstraint("ck_transfers_distinct_accounts", "source_account_id <> destination_account_id");
+                        });
+                });
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.AccountRow", b =>
+                {
+                    b.HasOne("TestTaskKICB.Infrastructure.Models.CustomerRow", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_accounts_customers");
+                });
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.CardRow", b =>
+                {
+                    b.HasOne("TestTaskKICB.Infrastructure.Models.AccountRow", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_cards_accounts");
+                });
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.PhoneRow", b =>
+                {
+                    b.HasOne("TestTaskKICB.Infrastructure.Models.CustomerRow", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_phones_customers");
+                });
+
+            modelBuilder.Entity("TestTaskKICB.Infrastructure.Models.TransferRow", b =>
+                {
+                    b.HasOne("TestTaskKICB.Infrastructure.Models.AccountRow", null)
+                        .WithMany()
+                        .HasForeignKey("DestinationAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TestTaskKICB.Infrastructure.Models.AccountRow", null)
+                        .WithMany()
+                        .HasForeignKey("SourceAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}

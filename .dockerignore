@@ -1,0 +1,17 @@
+.git
+**/.git
+.env
+.env.*
+**/.env
+**/.env.*
+**/bin
+**/obj
+**/.vs
+**/.idea
+**/.vscode
+**/TestResults
+**/*.user
+**/*.suo
+**/*.db*
+**/*.sqlite*
+tests

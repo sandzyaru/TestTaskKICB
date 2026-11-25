@@ -1,0 +1,4 @@
+@TestTaskKICB_HostAddress = http://localhost:8080
+
+GET {{TestTaskKICB_HostAddress}}/api/customers
+Accept: application/json

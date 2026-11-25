@@ -1,0 +1,41 @@
+name: testtaskkicb
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bank}
+      POSTGRES_USER: ${POSTGRES_USER:-bank}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bank_local}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - bank-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-54320}:5432"
+
+  api:
+    image: "testtaskkicb:${COMPOSE_PROJECT_NAME:-testtaskkicb}"
+    build: .
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Bank__Host: db
+      Bank__Database: "${POSTGRES_DB:-bank}"
+      Bank__Username: "${POSTGRES_USER:-bank}"
+      Bank__Password: "${POSTGRES_PASSWORD:-bank_local}"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--max-time", "2", "http://127.0.0.1:8080/health/ready"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    ports:
+      - "127.0.0.1:${API_PORT:-8080}:8080"
+
+volumes:
+  bank-data:
